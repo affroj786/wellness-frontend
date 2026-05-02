@@ -63,16 +63,18 @@ function Login() {
     setFeedback("");
 
     try {
-      const response = await apiFetch('/users/login', {
-        method: 'POST',
+      const response = await apiFetch("/auth/login", {
+        method: "POST",
         body: JSON.stringify({ email, password })
       });
-      
-      localStorage.setItem("studentProfile", JSON.stringify(response.users));
+
+      const profile = response.user || buildProfileFromEmail(email);
+
+      localStorage.setItem("studentProfile", JSON.stringify(profile));
+      localStorage.setItem("user", JSON.stringify(profile));
       localStorage.setItem("token", response.token);
       localStorage.setItem("isLoggedIn", "true");
       window.dispatchEvent(new Event("authchange"));
-      localStorage.setItem("user", JSON.stringify(response));
 
       navigate("/dashboard");
     } catch (error) {

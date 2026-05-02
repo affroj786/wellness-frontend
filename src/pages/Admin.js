@@ -10,13 +10,6 @@ const sidebarItems = [
   { title: "Settings", description: "Platform controls and permissions" }
 ];
 
-const metrics = [
-  { label: "Total students", value: "1,284", note: "Up 8% this month" },
-  { label: "Open requests", value: "24", note: "Six need urgent triage" },
-  { label: "Reports generated", value: "48", note: "Weekly summary ready" },
-  { label: "Programs live", value: "12", note: "Three cohorts start Friday" }
-];
-
 const students = [
   {
     name: "Arif Khan",

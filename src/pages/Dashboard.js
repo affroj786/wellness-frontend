@@ -111,16 +111,14 @@ function readStudentProfile() {
 
 function Dashboard() {
   const navigate = useNavigate();
-  
- const user = JSON.parse(localStorage.getItem("user"));
-const firstName = user?.name?.split(" ")[0] || "Student";
+  const profile = readStudentProfile();
+  const firstName = profile?.name?.split(" ")[0] || "Student";
 
-useEffect(() => {
-  const user = localStorage.getItem("user");
-  if (!user) {
-    navigate("/login");
-  }
-}, [navigate]);
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/login");
+    }
+  }, [navigate]);
 
   return (
     <div className="page-shell">

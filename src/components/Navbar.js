@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { clearAuthState } from "../api";
 
 const defaultProfile = {
   name: "Affroj Shaik",
@@ -67,9 +68,8 @@ function Navbar({ darkMode, onToggleTheme }) {
     : publicLinks;
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
+    clearAuthState();
     setShowProfile(false);
-    window.dispatchEvent(new Event("authchange"));
     navigate("/");
   };
 

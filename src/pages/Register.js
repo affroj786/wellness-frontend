@@ -13,7 +13,7 @@ function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [captcha, setCaptcha] = useState(createCaptcha);
+  const [captcha, setCaptcha] = useState(createCaptcha());
   const [captchaInput, setCaptchaInput] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isError, setIsError] = useState(false);
@@ -22,7 +22,7 @@ function Register() {
     email: "",
     password: "",
     course: "B.Tech CSE",
-    academicYear: "3rd Year"
+    year: "3rd Year"
   });
 
   const updateField = (field, value) => {
@@ -58,18 +58,27 @@ function Register() {
     setFeedback("");
 
     try {
-      const response = await apiFetch('/users',{
-        method: 'POST',
+      const response = await apiFetch("/auth/register", {
+        method: "POST",
         body: JSON.stringify(formData)
       });
-      
-      localStorage.setItem("studentProfile", JSON.stringify(response));
+
+      const profile = response.user || {
+        name: formData.name,
+        email: formData.email,
+        course: formData.course,
+        year: formData.year,
+        status: "Active"
+      };
+
+      localStorage.setItem("studentProfile", JSON.stringify(profile));
+      localStorage.setItem("user", JSON.stringify(profile));
       localStorage.setItem("token", response.token);
       localStorage.setItem("isLoggedIn", "true");
       window.dispatchEvent(new Event("authchange"));
 
       setFeedback("Account created successfully. Redirecting...");
-      window.setTimeout(() => navigate("/dashboard"), 900);
+      setTimeout(() => navigate("/dashboard"), 1000);
     } catch (error) {
       setIsError(true);
       setFeedback(error.message || "Registration failed. Please try again.");
@@ -82,182 +91,86 @@ function Register() {
     <div className="page-shell">
       <section className="auth-layout">
         <div className="auth-spotlight premium-card">
-          <span className="hero-eyebrow hero-eyebrow-light">New account</span>
-          <h2 className="display-title" style={{ marginTop: "18px" }}>
-            Join a wellness platform that feels intentionally designed.
-          </h2>
-          <p className="subtle-copy">
-            Registration now looks and behaves like a real digital product,
-            with clearer fields, stronger pacing, and a more premium first
-            impression.
+          <h2>Join the Wellness Platform</h2>
+          <p>
+            Create your student account to access fitness programs,
+            mental health support, and nutrition guidance.
           </p>
-
-          <div className="metric-strip" style={{ marginTop: "22px" }}>
-            <div className="metric-pill">
-              <span>Onboarding</span>
-              <strong>Under 2 min</strong>
-            </div>
-            <div className="metric-pill">
-              <span>Profile setup</span>
-              <strong>Guided</strong>
-            </div>
-            <div className="metric-pill">
-              <span>Dashboard access</span>
-              <strong>Ready next</strong>
-            </div>
-          </div>
-
-          <ul className="auth-list">
-            <li>
-              <span className="auth-index">01</span>
-              <div>
-                <strong>Create your student profile</strong>
-                <p>Store the basic details used throughout the interface.</p>
-              </div>
-            </li>
-            <li>
-              <span className="auth-index">02</span>
-              <div>
-                <strong>Enter the wellness dashboard</strong>
-                <p>Access resources, programs, and support in one place.</p>
-              </div>
-            </li>
-          </ul>
         </div>
 
         <div className="premium-card auth-card">
-          <span className="mini-kicker">Register</span>
-          <h2>Create your account</h2>
-          <p>
-            Set up a student profile to unlock a more polished wellness
-            experience across every page.
-          </p>
+          <h2>Create Account</h2>
 
-          <form className="form-stack" onSubmit={handleSubmit}>
-            <div className="field-group">
-              <label className="field-label" htmlFor="register-name">
-                Full name
-              </label>
+          <form onSubmit={handleSubmit}>
+            <input
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={(e) => updateField("name", e.target.value)}
+            />
+
+            <input
+              placeholder="Email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => updateField("email", e.target.value)}
+            />
+
+            <div>
               <input
-                className="field-input"
-                id="register-name"
-                onChange={(event) => updateField("name", event.target.value)}
-                placeholder="Enter your full name"
-                type="text"
-                value={formData.name}
+                placeholder="Password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => updateField("password", e.target.value)}
               />
-            </div>
-
-            <div className="field-group">
-              <label className="field-label" htmlFor="register-email">
-                Email address
-              </label>
-              <input
-                className="field-input"
-                id="register-email"
-                onChange={(event) => updateField("email", event.target.value)}
-                placeholder="name@university.edu"
-                type="email"
-                value={formData.email}
-              />
-            </div>
-
-            <div className="field-group">
-              <label className="field-label" htmlFor="register-password">
-                Password
-              </label>
-              <div className="input-row">
-                <input
-                  className="field-input"
-                  id="register-password"
-                  onChange={(event) => updateField("password", event.target.value)}
-                  placeholder="Create a secure password"
-                  type={showPassword ? "text" : "password"}
-                  value={formData.password}
-                />
-                <button
-                  className="ghost-btn"
-                  onClick={() => setShowPassword((current) => !current)}
-                  type="button"
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              </div>
-            </div>
-
-            <div className="form-grid-two">
-              <div className="field-group">
-                <label className="field-label" htmlFor="register-course">
-                  Course
-                </label>
-                <select
-                  className="field-select"
-                  id="register-course"
-                  onChange={(event) => updateField("course", event.target.value)}
-                  value={formData.course}
-                >
-                  <option>B.Tech CSE</option>
-                  <option>BBA</option>
-                  <option>MBA</option>
-                  <option>B.Sc Nutrition</option>
-                </select>
-              </div>
-
-              <div className="field-group">
-                <label className="field-label" htmlFor="register-year">
-                  Academic year
-                </label>
-                <select
-                  className="field-select"
-                  id="register-year"
-                 onChange={(event) => updateField("academicYear", event.target.value)}
-                 value={formData.academicYear}
-                >
-                  <option>1st Year</option>
-                  <option>2nd Year</option>
-                  <option>3rd Year</option>
-                  <option>4th Year</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="field-group">
-              <label className="field-label" htmlFor="register-captcha">
-                Verification
-              </label>
-              <div className="input-row">
-                <input
-                  className="field-input"
-                  id="register-captcha"
-                  onChange={(event) => setCaptchaInput(event.target.value)}
-                  placeholder={`Solve ${captcha.first} + ${captcha.second}`}
-                  type="text"
-                  value={captchaInput}
-                />
-                <button className="ghost-btn" onClick={refreshCaptcha} type="button">
-                  Refresh
-                </button>
-              </div>
-            </div>
-
-            {feedback ? (
-              <div
-                className={`form-feedback ${
-                  isError ? "form-feedback-error" : "form-feedback-success"
-                }`}
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
               >
-                {feedback}
-              </div>
-            ) : null}
-
-            <div className="form-actions">
-              <button className="primary-btn" disabled={loading} type="submit">
-                {loading ? "Creating..." : "Register"}
+                {showPassword ? "Hide" : "Show"}
               </button>
-              <Link className="secondary-btn" to="/login">
-                Already registered
-              </Link>
             </div>
+
+            <select
+              value={formData.course}
+              onChange={(e) => updateField("course", e.target.value)}
+            >
+              <option>B.Tech CSE</option>
+              <option>BBA</option>
+              <option>MBA</option>
+              <option>B.Sc Nutrition</option>
+            </select>
+
+            <select
+              value={formData.year}
+              onChange={(e) => updateField("year", e.target.value)}
+            >
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+            </select>
+
+            <input
+              placeholder={`Solve ${captcha.first} + ${captcha.second}`}
+              value={captchaInput}
+              onChange={(e) => setCaptchaInput(e.target.value)}
+            />
+
+            <button type="button" onClick={refreshCaptcha}>
+              Refresh Captcha
+            </button>
+
+            {feedback && (
+              <p style={{ color: isError ? "red" : "green" }}>
+                {feedback}
+              </p>
+            )}
+
+            <button type="submit" disabled={loading}>
+              {loading ? "Creating..." : "Register"}
+            </button>
+
+            <Link to="/login">Already have an account?</Link>
           </form>
         </div>
       </section>
