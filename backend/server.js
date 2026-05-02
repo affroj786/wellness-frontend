@@ -12,6 +12,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_change_in_prod
 app.use(cors());
 app.use(express.json());
 
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'ok' });
+});
+
 // --- Middleware ---
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
